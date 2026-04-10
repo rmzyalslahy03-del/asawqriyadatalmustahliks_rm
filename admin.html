@@ -336,12 +336,12 @@
     </button>
 
     <script>
-        // ================== Supabase Client (NEW) ==================
+        // ================== Supabase Client (تم تحديث المتغيرات) ==================
         const SUPABASE_URL = "https://yfewocuxzqaehirtnzft.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_l6xR4jAntftBR7YnUlV2wg_A0E5NaQB";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // ================== البيانات الافتراضية ==================
+        // ================== البيانات الافتراضية (نفس السابق) ==================
         const defaultData = {
             header: {
                 title: "مجمع أسواق ريادة المستهلك",
@@ -496,80 +496,9 @@
         let currentEditCarouselId = null;
         let currentEditTestimonialIndex = null;
 
-        // ================== دوال Supabase الأساسية مع إنشاء الجداول والبيانات التجريبية ==================
-        async function ensureTablesAndSeed() {
-            // التحقق من وجود جدول settings
-            const { error: checkError } = await supabaseClient.from('settings').select('id').limit(1);
-            if (checkError && checkError.code === '42P01') {
-                // الجداول غير موجودة، نقوم بإنشائها عبر SQL الخام (نستخدم RPC إن وجد أو نضطر لإنشاء يدوي)
-                // لكن في Supabase، لا يمكن إنشاء الجداول من الواجهة الأمامية مباشرة.
-                // سنستخدم واجهة الإدارة اليدوية. بدلاً من ذلك، سنقوم بتعبئة البيانات عبر واجهة الإدارة المضمنة؟
-                // الحل: سيتم إنشاء الجداول يدوياً من قبل المستخدم مرة واحدة، أو يمكن استخدام supabase_admin.
-                // لكن لتسهيل الأمر، سنعرض رسالة للمستخدم لتوجيهه لإنشاء الجداول.
-                console.warn("الجداول غير موجودة. يرجى إنشاؤها يدوياً من لوحة تحكم Supabase.");
-                showToast("⚠️ لم يتم العثور على الجداول. سيتم إنشاؤها تلقائياً باستخدام واجهة الإدارة. الرجاء المحاولة مرة أخرى بعد لحظات.");
-                // محاولة إنشاء الجداول عبر استدعاء دالة RPC (إذا كانت معرفة مسبقاً)
-                // نقوم بمحاولة استدعاء دالة `setup_tables` (يجب أن تكون موجودة مسبقاً في Supabase)
-                const { error: rpcError } = await supabaseClient.rpc('setup_tables');
-                if (rpcError) {
-                    console.error("فشل إنشاء الجداول تلقائياً:", rpcError);
-                    showToast("فشل إنشاء الجداول تلقائياً. يرجى إنشاء الجداول يدوياً باستخدام SQL المرفق.");
-                } else {
-                    // بعد إنشاء الجداول، نملأها بالبيانات التجريبية
-                    await seedSupabase();
-                }
-            } else {
-                // الجداول موجودة، نتحقق من وجود بيانات
-                const { data: settingsData } = await supabaseClient.from('settings').select('id').eq('id', 'main').single();
-                if (!settingsData) {
-                    await seedSupabase();
-                }
-            }
-        }
-
-        async function seedSupabase() {
-            const enhanced = enhanceData(JSON.parse(JSON.stringify(defaultData)));
-            // إدراج الإعدادات
-            await supabaseClient.from('settings').upsert({
-                id: 'main',
-                data: {
-                    header: enhanced.header,
-                    ticker: enhanced.ticker,
-                    design: enhanced.design,
-                    footer: enhanced.footer,
-                    settings: enhanced.settings
-                }
-            });
-            // إدراج الفئات
-            for (const cat of enhanced.categories) {
-                await supabaseClient.from('categories').upsert(cat);
-            }
-            // إدراج المتاجر
-            for (const catName in enhanced.stores) {
-                for (const store of enhanced.stores[catName]) {
-                    await supabaseClient.from('stores').upsert(store);
-                }
-            }
-            // إدراج المنتجات
-            for (const storeId in enhanced.products) {
-                for (const prod of enhanced.products[storeId]) {
-                    await supabaseClient.from('products').upsert({ ...prod, storeId });
-                }
-            }
-            // إدراج التقييمات
-            for (const t of enhanced.testimonials) {
-                await supabaseClient.from('testimonials').upsert(t);
-            }
-            // إدراج الإعلانات الدوارة
-            for (const ad of enhanced.carousel) {
-                await supabaseClient.from('carousel').upsert(ad);
-            }
-            showToast("✅ تم تهيئة قاعدة البيانات بالبيانات التجريبية");
-        }
-
+        // ================== دوال Supabase الأساسية (نفس السابق) ==================
         async function loadFromSupabase() {
             try {
-                await ensureTablesAndSeed(); // تأكد من وجود الجداول والبيانات
                 const { data: settings, error: settingsErr } = await supabaseClient
                     .from('settings')
                     .select('data')
@@ -682,6 +611,30 @@
             }
             const { data: remoteUsers } = await supabaseClient.from('users').select('*');
             if (remoteUsers) localStorage.setItem('users', JSON.stringify(remoteUsers));
+        }
+
+        async function seedSupabase() {
+            const enhanced = enhanceData(JSON.parse(JSON.stringify(defaultData)));
+            await supabaseClient.from('settings').insert({
+                id: 'main',
+                data: {
+                    header: enhanced.header,
+                    ticker: enhanced.ticker,
+                    design: enhanced.design,
+                    footer: enhanced.footer,
+                    settings: enhanced.settings
+                }
+            });
+            for (const cat of enhanced.categories) await supabaseClient.from('categories').insert(cat);
+            for (const catName in enhanced.stores) {
+                for (const store of enhanced.stores[catName]) await supabaseClient.from('stores').insert(store);
+            }
+            for (const storeId in enhanced.products) {
+                for (const prod of enhanced.products[storeId]) await supabaseClient.from('products').insert({ ...prod, storeId });
+            }
+            for (const t of enhanced.testimonials) await supabaseClient.from('testimonials').insert(t);
+            for (const ad of enhanced.carousel) await supabaseClient.from('carousel').insert(ad);
+            showToast("✅ تم تهيئة قاعدة البيانات بنجاح");
         }
 
         function updateAutoSaveBadge() {
@@ -899,7 +852,7 @@
             return null;
         }
 
-        // ================== دوال CRUD (نفس السابق مع استخدام saveToSupabase) ==================
+        // ================== دوال CRUD ==================
         window.editCategory = function(id) {
             const cat = appData.categories.find(c => c.id === id);
             if (!cat) return;
@@ -920,8 +873,8 @@
 
         window.deleteCategory = async function(id) {
             if (confirm('هل أنت متأكد من حذف هذه الفئة؟')) {
-                appData.categories = appData.categories.filter(c => c.id !== id);
                 const catName = appData.categories.find(c => c.id === id)?.name;
+                appData.categories = appData.categories.filter(c => c.id !== id);
                 if (catName && appData.stores[catName]) delete appData.stores[catName];
                 await saveToSupabase();
                 refreshAllLists();
@@ -1080,7 +1033,7 @@
             }
         };
 
-        // ================== أزرار الإضافة والتحديث (بنفس السابق) ==================
+        // ================== أزرار الإضافة والتحديث ==================
         document.getElementById('addCategoryBtn').addEventListener('click', async () => {
             const name = document.getElementById('categoryName').value;
             if (!name) return alert('اسم الفئة مطلوب');
@@ -1454,6 +1407,7 @@
             showToast('✅ تم إعادة تعيين العداد');
         });
 
+        // استيراد وتصدير JSON
         document.getElementById('exportJsonBtn').addEventListener('click', () => {
             const dataStr = JSON.stringify(appData, null, 2);
             const blob = new Blob([dataStr], {type: "application/json"});
@@ -1490,6 +1444,7 @@
             reader.readAsText(file);
         });
 
+        // رفع الصور
         function handleImageUpload(fileInput, targetInputId) {
             if (fileInput.files && fileInput.files[0]) {
                 const reader = new FileReader();
@@ -1531,9 +1486,10 @@
         });
         document.getElementById('storePermissionSelect').addEventListener('change', () => populateStorePermissions());
 
+        // تسجيل الدخول (بنفس الرقم السري 404142)
         window.checkLogin = async function() {
             const code = document.getElementById('secretCodeInput').value;
-            if (code === "252627") {
+            if (code === "404142") {
                 document.getElementById('loginOverlay').style.display = 'none';
                 document.getElementById('adminContent').style.display = 'block';
                 document.getElementById('previewChangesBtn').style.display = 'block';
