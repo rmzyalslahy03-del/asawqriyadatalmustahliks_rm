@@ -17,6 +17,7 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { background-color: #f4f7fc; color: #1e293b; line-height: 1.6; user-select: none; }
+
         :root {
             --category-bg: linear-gradient(145deg, #f9eef7, #f3d9e8);
             --category-text: #9b4d96;
@@ -32,23 +33,36 @@
             --ad-font-size: 1.1rem;
             --general-font-size: 1rem;
         }
-        header { position: relative; color: white; padding: 3rem 0; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: 100%; border-radius: 0 0 30px 30px; background-size: cover; background-position: center; transition: background-image 1s ease-in-out; }
-        header::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); border-radius: 0 0 30px 30px; }
+
+        header {
+            position: relative; color: white; padding: 3rem 0; text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); width: 100%;
+            border-radius: 0 0 30px 30px; background-size: cover; background-position: center;
+            transition: background-image 1s ease-in-out;
+        }
+        header::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5); border-radius: 0 0 30px 30px;
+        }
         header .container { position: relative; z-index: 2; }
         header h1 { font-size: 2.8rem; margin-bottom: 0.5rem; font-weight: 700; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
         header p { font-size: 1.4rem; opacity: 0.95; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+
         .top-bar { background: #0f172a; color: white; padding: 0.5rem 2rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; }
         .top-bar-left { display: flex; align-items: center; gap: 15px; }
         .top-bar-left img.flag { width: 32px; height: 20px; border-radius: 4px; }
         .top-bar-right { display: flex; align-items: center; gap: 15px; }
         .admin-link { background: #fbbf24; color: #0f172a; border: none; padding: 0.5rem 1.5rem; border-radius: 40px; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.2s; text-decoration: none; display: inline-block; }
         .admin-link:hover { background: #f59e0b; transform: scale(1.02); }
+
         .profile-link { cursor: pointer; font-size: 1.5rem; color: #fbbf24; transition: transform 0.2s; }
         .profile-link:hover { transform: scale(1.1); }
+
         .cart-icon { position: relative; cursor: pointer; }
         .cart-icon i { font-size: 1.5rem; color: #fbbf24; transition: transform 0.2s; }
         .cart-icon:hover i { transform: scale(1.1); }
         .cart-count { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; border-radius: 50%; width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; font-weight: bold; }
+
         .cart-sidebar { position: fixed; top: 0; left: -400px; width: 350px; height: 100%; background: white; box-shadow: 2px 0 10px rgba(0,0,0,0.2); z-index: 1000; transition: left 0.3s ease; padding: 20px; overflow-y: auto; }
         .cart-sidebar.open { left: 0; }
         .cart-sidebar h3 { margin-bottom: 20px; color: #0f172a; }
@@ -68,40 +82,42 @@
         .cart-actions button:hover { transform: scale(1.02); filter: brightness(1.1); }
         .close-cart { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.5rem; cursor: pointer; transition: color 0.2s; }
         .close-cart:hover { color: #ef4444; }
+
         .top-ticker { background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #0f172a; padding: 0.6rem 0; font-weight: 700; font-size: var(--ad-font-size); overflow: hidden; white-space: nowrap; border-bottom: 2px solid #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
         .top-ticker-content { display: inline-block; animation: ticker 25s linear infinite; padding-left: 100%; }
         .top-ticker-content span { margin: 0 30px; }
         @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
         .search-container { display: flex; justify-content: center; align-items: center; padding: 1rem 2rem; background-color: #fff; border-bottom: 1px solid #e2e8f0; }
         .search-bar { display: flex; align-items: center; background: #f1f5f9; border-radius: 40px; padding: 0.3rem 0.3rem 0.3rem 1rem; width: 100%; max-width: 600px; transition: box-shadow 0.3s ease; }
         .search-bar:focus-within { box-shadow: 0 0 0 3px rgba(251,191,36,0.5); }
         .search-bar input { flex: 1; border: none; padding: 0.5rem; font-size: 1rem; outline: none; background: transparent; }
         .search-bar button { background: #fbbf24; border: none; border-radius: 40px; padding: 0.5rem 1rem; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; gap: 5px; }
         .search-bar button:hover { background: #f59e0b; }
+
         .refresh-btn { text-align: left; padding: 10px 5%; display: none; }
         .refresh-btn button { background: #3b82f6; color: white; border: none; padding: 8px 20px; border-radius: 40px; font-weight: 600; cursor: pointer; }
         .refresh-toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 10px 20px; border-radius: 40px; font-weight: bold; z-index: 9999; animation: slideDown 0.3s ease; }
         @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
         .update-notification { position: fixed; top: 20px; right: 20px; background: #fbbf24; color: #0f172a; padding: 10px 20px; border-radius: 40px; font-weight: bold; z-index: 9999; animation: slideInLeft 0.3s ease; }
         @keyframes slideInLeft { from { right: -100px; opacity: 0; } to { right: 20px; opacity: 1; } }
+
         .index-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width: 1000px; margin: 1.5rem auto; padding: 0 15px; }
         .index-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s; text-decoration: none; color: inherit; display: flex; flex-direction: column; border: 2px solid transparent; cursor: pointer; }
         .index-item:hover { transform: translateY(-3px); border-color: currentColor; box-shadow: 0 10px 20px rgba(0,0,0,0.15); }
         .index-image { height: 80px; background-size: cover; background-position: center; }
         .index-title { padding: 8px; font-weight: 600; font-size: 0.9rem; text-align: center; background: white; }
         .index-title i { margin-left: 4px; }
+
         .category-section { width: 100%; padding: 2rem 5%; margin-bottom: 1.5rem; background: var(--category-bg); }
         .category-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; margin-bottom: 20px; }
         .category-title { font-size: var(--category-font-size); font-weight: 700; padding-right: 15px; border-right: 8px solid var(--category-text); color: var(--category-text); }
         .category-featured-image { width: 150px; height: 100px; border-radius: 20px; object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.15); border: 3px solid white; transition: transform 0.3s; }
         .category-featured-image:hover { transform: scale(1.02); }
+
         .category-ticker { background: linear-gradient(90deg, #fbbf24, #f59e0b); color: #0f172a; padding: 0.5rem; font-weight: 700; font-size: 0.9rem; overflow: hidden; white-space: nowrap; border-radius: 40px; margin: 10px 0; }
         .category-ticker-content { display: inline-block; animation: ticker 20s linear infinite; padding-left: 100%; }
-        .demo-products { margin: 20px 0; padding: 20px; border-radius: 30px; background: rgba(255,255,255,0.7); backdrop-filter: blur(5px); }
-        .demo-products-track { display: flex; gap: 15px; overflow-x: auto; }
-        .demo-product-item { flex: 0 0 140px; background: white; border-radius: 20px; padding: 10px; text-align: center; transition: transform 0.3s, box-shadow 0.3s; }
-        .demo-product-item:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .demo-product-item img { width: 100px; height: 100px; border-radius: 15px; object-fit: cover; }
+
         .stores-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 25px; margin-top: 20px; }
         .stores-horizontal { overflow-x: auto; white-space: nowrap; padding: 15px 0; margin-bottom: 20px; }
         .stores-track { display: inline-flex; gap: 15px; }
@@ -120,6 +136,7 @@
         .store-category-badge { font-size: 0.75rem; padding: 4px 10px; border-radius: 30px; font-weight: 600; display: inline-block; margin-top: 4px; }
         .store-visit-btn { background: #3b82f6; color: white; border: none; border-radius: 30px; padding: 5px 12px; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: background 0.2s, transform 0.2s; display: inline-flex; align-items: center; gap: 5px; margin-right: 8px; text-decoration: none; }
         .store-visit-btn:hover { background: #2563eb; transform: scale(1.02); }
+
         .products-horizontal { padding: 15px; overflow-x: auto; white-space: nowrap; background: #f9fcff; margin-bottom: 20px; border-radius: 20px; }
         .products-track { display: inline-flex; gap: 15px; }
         .product-item { width: 150px; display: inline-block; text-align: center; background: var(--product-bg); border-radius: 16px; padding: 10px; border: 1px solid #edf2f7; white-space: normal; color: var(--product-text); transition: transform 0.3s, box-shadow 0.3s; position: relative; cursor: pointer; }
@@ -136,17 +153,21 @@
         .like-btn.liked { color: #ef4444; }
         .favorite-btn.favorited { color: #fbbf24; }
         .product-visit-btn:hover, .add-to-cart-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+
         .share-popup { position: absolute; background: white; border-radius: 40px; padding: 10px 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.2); display: flex; gap: 15px; z-index: 1000; direction: ltr; }
         .share-popup a, .share-popup button { color: #1e293b; font-size: 1.5rem; transition: transform 0.2s; background: none; border: none; cursor: pointer; }
         .share-popup a:hover, .share-popup button:hover { transform: scale(1.2); }
+
         .carousel-ad { margin: 2rem 5%; position: relative; overflow: hidden; border-radius: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); background: var(--ad-bg); color: var(--ad-text); }
         .carousel-track { display: flex; transition: transform 0.5s ease; }
         .carousel-slide { flex: 0 0 100%; text-align: center; padding: 20px; }
         .carousel-slide img { max-width: 100%; max-height: 200px; object-fit: cover; border-radius: 15px; }
         .carousel-slide a { display: block; color: inherit; text-decoration: none; }
         .carousel-slide a:hover { opacity: 0.8; }
+
         .whatsapp-float { position: fixed; bottom: 30px; left: 30px; background: #25d366; color: white; width: 60px; height: 60px; border-radius: 50%; text-align: center; font-size: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 100; display: flex; align-items: center; justify-content: center; transition: background 0.3s, transform 0.3s; text-decoration: none; }
         .whatsapp-float:hover { background: #128C7E; transform: scale(1.1); }
+
         .testimonials-section { background: white; border-radius: 40px; padding: 2rem 5%; margin: 2rem 5%; }
         .testimonials-title { font-size: 2rem; text-align: center; margin-bottom: 30px; }
         .testimonials-horizontal { overflow-x: auto; cursor: grab; }
@@ -154,9 +175,11 @@
         .testimonial-card { background: #f8fafc; padding: 20px; border-radius: 25px; width: 300px; flex-shrink: 0; transition: transform 0.3s; }
         .testimonial-card:hover { transform: translateY(-3px); }
         .customer-img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 3px solid #3b82f6; }
+
         .trust-badges { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; padding: 20px 5%; background: #f8fafc; }
         .trust-badges img { height: 40px; width: auto; transition: transform 0.3s; }
         .trust-badges img:hover { transform: scale(1.1); }
+
         .footer-info { background: white; border-radius: 40px; padding: 2rem 5%; margin: 2rem 5%; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 30px; }
         .social-icons { display: flex; gap: 15px; }
         .social-icons a { display: flex; align-items: center; justify-content: center; width: 45px; height: 45px; background: #f1f5f9; border-radius: 50%; color: #0f172a; font-size: 1.3rem; transition: background 0.3s, transform 0.3s; }
@@ -165,12 +188,15 @@
         .payment-methods i { font-size: 2.5rem; color: #1e293b; transition: transform 0.3s; }
         .payment-methods i:hover { transform: scale(1.1); }
         .copyright { text-align: center; padding: 20px; color: #64748b; border-top: 1px solid #e2e8f0; }
+
         .contests-bar { background: #8b5cf6; color: white; padding: 10px; overflow: hidden; white-space: nowrap; }
         .contests-content { display: inline-block; animation: ticker 30s linear infinite; }
         .contest-item { display: inline-block; margin: 0 30px; }
         .contest-item i { margin-left: 5px; }
+
         .store-owner-upload { margin-top: 15px; padding: 15px; background: #f1f5f9; border-radius: 20px; }
         .store-owner-upload input { margin: 5px 0; padding: 8px; border-radius: 20px; border: 1px solid #cbd5e1; width: 100%; }
+
         .profile-page { padding: 2rem; background: white; border-radius: 40px; margin: 2rem; }
         .profile-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
         .profile-tab { background: none; border: none; padding: 10px 20px; font-size: 1.1rem; cursor: pointer; color: #64748b; border-radius: 40px; transition: background 0.3s, color 0.3s; }
@@ -180,18 +206,22 @@
         .profile-product-card { background: #f8fafc; border-radius: 20px; padding: 15px; text-align: center; transition: transform 0.3s; }
         .profile-product-card:hover { transform: translateY(-3px); }
         .profile-product-card img { width: 100px; height: 100px; border-radius: 15px; object-fit: cover; }
+
         .contact-form { max-width: 600px; margin: 2rem auto; background: white; border-radius: 40px; padding: 2rem; }
         .contact-form h2 { margin-bottom: 20px; }
         .contact-form input, .contact-form textarea { width: 100%; padding: 12px; border-radius: 40px; border: 1px solid #e2e8f0; margin-bottom: 15px; font-size: 1rem; transition: border-color 0.3s, box-shadow 0.3s; }
         .contact-form input:focus, .contact-form textarea:focus { border-color: #fbbf24; outline: none; box-shadow: 0 0 0 3px rgba(251,191,36,0.2); }
         .contact-form button { background: #fbbf24; color: #0f172a; border: none; padding: 12px 30px; border-radius: 40px; font-weight: 600; cursor: pointer; transition: background 0.3s, transform 0.3s; }
         .contact-form button:hover { background: #f59e0b; transform: scale(1.02); }
+
         .product-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 10000; }
         .product-modal-content { background: white; border-radius: 40px; padding: 30px; max-width: 500px; width: 90%; text-align: center; position: relative; }
         .product-modal-content img { width: 200px; height: 200px; border-radius: 20px; object-fit: cover; margin-bottom: 20px; }
         .product-modal-close { position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+
         .multi-horizontal { margin-bottom: 20px; }
         .multi-horizontal .section-title { font-size: 1.2rem; margin: 10px 0 5px; color: #0f172a; }
+
         .hidden { display: none !important; }
         .container { max-width: 1400px; margin: 0 auto; padding: 0 15px; }
         .full-width { width: 100%; }
@@ -226,18 +256,26 @@
     <div class="cart-sidebar" id="cartSidebar"><button class="close-cart" id="closeCart"><i class="fas fa-times"></i></button><h3>سلة التسوق</h3><div id="cartItems"></div><div class="cart-total" id="cartTotal">الإجمالي: 0</div><div class="cart-actions" id="cartActions"></div></div>
 
     <script>
-        function sanitizeText(str) { if (!str) return ''; const div = document.createElement('div'); div.textContent = str; return div.innerHTML; }
-        function showToast(msg) { const toast = document.createElement('div'); toast.className = 'update-notification'; toast.textContent = msg; document.body.appendChild(toast); setTimeout(() => toast.remove(), 3000); }
-
+        // ================== Supabase Client ==================
         const SUPABASE_URL = "https://yfewocuxzqaehirtnzft.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_l6xR4jAntftBR7YnUlV2wg_A0E5NaQB";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ================== تعريف showToast في بداية السكريبت ==================
+        function showToast(msg) {
+            const toast = document.createElement('div');
+            toast.className = 'update-notification';
+            toast.textContent = msg;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // ================== البيانات الافتراضية ==================
         const defaultData = {
-            "header": {
-                "title": "مجمع أسواق ريادة المستهلك",
-                "subtitle": "أفضل المتاجر والمنتجات بأفضل الأسعار",
-                "images": [
+            header: {
+                title: "مجمع أسواق ريادة المستهلك",
+                subtitle: "أفضل المتاجر والمنتجات بأفضل الأسعار",
+                images: [
                     "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?w=1600&h=600&fit=crop",
                     "https://images.unsplash.com/photo-1542838132-92c53300491e?w=1600&h=600&fit=crop",
                     "https://images.unsplash.com/photo-1555529669-e69e7aa56ba9?w=1600&h=600&fit=crop",
@@ -245,7 +283,7 @@
                     "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=1600&h=600&fit=crop"
                 ]
             },
-            "ticker": [
+            ticker: [
                 "🔥 عروض حصرية تصل إلى 50% خصم",
                 "💎 أشهر الماركات العالمية",
                 "🚚 توصيل مجاني للطلبات فوق 200 ريال",
@@ -253,103 +291,47 @@
                 "💰 خصم خاص للعملاء الجدد 20%",
                 "⭐ تقييمات عملاء ممتازة"
             ],
-            "carousel": [],
-            "design": {
-                "categoryBg": "linear-gradient(145deg, #f9eef7, #f3d9e8)",
-                "categoryText": "#9b4d96",
-                "categoryFontSize": "2rem",
-                "storeBg": "#ffffff",
-                "storeText": "#1e293b",
-                "storeFontSize": "1.3rem",
-                "productBg": "#ffffff",
-                "productText": "#1e293b",
-                "productFontSize": "0.85rem",
-                "adBg": "linear-gradient(90deg, #fbbf24, #f59e0b)",
-                "adText": "#0f172a",
-                "adFontSize": "1.1rem",
-                "generalFontSize": "1rem"
+            carousel: [],
+            design: {
+                categoryBg: "linear-gradient(145deg, #f9eef7, #f3d9e8)",
+                categoryText: "#9b4d96",
+                categoryFontSize: "2rem",
+                storeBg: "#ffffff",
+                storeText: "#1e293b",
+                storeFontSize: "1.3rem",
+                productBg: "#ffffff",
+                productText: "#1e293b",
+                productFontSize: "0.85rem",
+                adBg: "linear-gradient(90deg, #fbbf24, #f59e0b)",
+                adText: "#0f172a",
+                adFontSize: "1.1rem",
+                generalFontSize: "1rem"
             },
-            "categories": [
-                { "id": "cat1", "name": "العطور والبخور", "icon": "fas fa-spray-can-sparkles", "slug": "perfumes", "color": "#9b4d96", "featuredImage": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 1, "adText": "", "adEnabled": false },
-                { "id": "cat2", "name": "الورد والهدايا", "icon": "fas fa-gift", "slug": "gifts", "color": "#d97706", "featuredImage": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 2, "adText": "", "adEnabled": false },
-                { "id": "cat3", "name": "الإكسسوارات", "icon": "fas fa-ring", "slug": "accessories", "color": "#4f6f8f", "featuredImage": "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 5, "adText": "", "adEnabled": false },
-                { "id": "cat4", "name": "الأزياء", "icon": "fas fa-tshirt", "slug": "fashion", "color": "#2563eb", "featuredImage": "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 4, "adText": "", "adEnabled": false },
-                { "id": "cat5", "name": "الإلكترونيات", "icon": "fas fa-laptop", "slug": "electronics", "color": "#0e7c7c", "featuredImage": "https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 5, "adText": "", "adEnabled": false }
+            categories: [
+                { id: "cat1", name: "العطور والبخور", icon: "fas fa-spray-can-sparkles", slug: "perfumes", color: "#9b4d96", featuredImage: "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=400&h=300&fit=crop", indexImage: "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&h=400&fit=crop", showInIndex: true, indexOrder: 1, adText: "", adEnabled: false },
+                { id: "cat2", name: "الورد والهدايا", icon: "fas fa-gift", slug: "gifts", color: "#d97706", featuredImage: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&h=300&fit=crop", indexImage: "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=600&h=400&fit=crop", showInIndex: true, indexOrder: 2, adText: "", adEnabled: false },
+                { id: "cat3", name: "الإكسسوارات", icon: "fas fa-ring", slug: "accessories", color: "#4f6f8f", featuredImage: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400&h=300&fit=crop", indexImage: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=400&fit=crop", showInIndex: true, indexOrder: 5, adText: "", adEnabled: false },
+                { id: "cat4", name: "الأزياء", icon: "fas fa-tshirt", slug: "fashion", color: "#2563eb", featuredImage: "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400&h=300&fit=crop", indexImage: "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=400&fit=crop", showInIndex: true, indexOrder: 4, adText: "", adEnabled: false },
+                { id: "cat5", name: "الإلكترونيات", icon: "fas fa-laptop", slug: "electronics", color: "#0e7c7c", featuredImage: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=400&h=300&fit=crop", indexImage: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&h=400&fit=crop", showInIndex: true, indexOrder: 5, adText: "", adEnabled: false }
             ],
-            "stores": {
-                "العطور والبخور": [
-                    { "id": "store-cat1-0", "name": "ديوان العطور", "category": "العطور والبخور", "logo": "https://picsum.photos/seed/cat10/100/100", "externalUrl": "#", "hidden": false, "description": "وصف المتجر", "phone": "+966 123 456 789", "address": "العنوان هنا", "ownerCode": "", "allowUpload": false, "productDisplayMode": "grid", "productDisplayCount": 10, "numStrips": 10 }
-                ],
-                "الورد والهدايا": [
-                    { "id": "store-cat2-0", "name": "زهرة الحب", "category": "الورد والهدايا", "logo": "https://picsum.photos/seed/cat20/100/100", "externalUrl": "#", "hidden": false, "description": "وصف المتجر", "phone": "+966 123 456 789", "address": "العنوان هنا", "ownerCode": "", "allowUpload": false, "productDisplayMode": "grid", "productDisplayCount": 10, "numStrips": 10 }
-                ],
-                "الإكسسوارات": [
-                    { "id": "store-cat3-0", "name": "إكسسوارات أنيقة", "category": "الإكسسوارات", "logo": "https://picsum.photos/seed/cat30/100/100", "externalUrl": "#", "hidden": false, "description": "وصف المتجر", "phone": "+966 123 456 789", "address": "العنوان هنا", "ownerCode": "", "allowUpload": false, "productDisplayMode": "grid", "productDisplayCount": 10, "numStrips": 10 }
-                ],
-                "الأزياء": [
-                    { "id": "store-cat4-0", "name": "موضة الشباب", "category": "الأزياء", "logo": "https://picsum.photos/seed/cat40/100/100", "externalUrl": "#", "hidden": false, "description": "وصف المتجر", "phone": "+966 123 456 789", "address": "العنوان هنا", "ownerCode": "", "allowUpload": false, "productDisplayMode": "grid", "productDisplayCount": 10, "numStrips": 10 }
-                ],
-                "الإلكترونيات": [
-                    { "id": "store-cat5-0", "name": "تك إلكترونيك", "category": "الإلكترونيات", "logo": "https://picsum.photos/seed/cat50/100/100", "externalUrl": "#", "hidden": false, "description": "وصف المتجر", "phone": "+966 123 456 789", "address": "العنوان هنا", "ownerCode": "", "allowUpload": false, "productDisplayMode": "grid", "productDisplayCount": 10, "numStrips": 10 }
-                ]
+            stores: {
+                "العطور والبخور": [{ id: "store-cat1-0", name: "ديوان العطور", category: "العطور والبخور", logo: "https://picsum.photos/seed/cat10/100/100", externalUrl: "#", hidden: false, description: "وصف المتجر", phone: "+966 123 456 789", address: "العنوان هنا", ownerCode: "", allowUpload: false, productDisplayMode: "grid", productDisplayCount: 10, numStrips: 10 }],
+                "الورد والهدايا": [{ id: "store-cat2-0", name: "زهرة الحب", category: "الورد والهدايا", logo: "https://picsum.photos/seed/cat20/100/100", externalUrl: "#", hidden: false, description: "وصف المتجر", phone: "+966 123 456 789", address: "العنوان هنا", ownerCode: "", allowUpload: false, productDisplayMode: "grid", productDisplayCount: 10, numStrips: 10 }],
+                "الإكسسوارات": [{ id: "store-cat3-0", name: "إكسسوارات أنيقة", category: "الإكسسوارات", logo: "https://picsum.photos/seed/cat30/100/100", externalUrl: "#", hidden: false, description: "وصف المتجر", phone: "+966 123 456 789", address: "العنوان هنا", ownerCode: "", allowUpload: false, productDisplayMode: "grid", productDisplayCount: 10, numStrips: 10 }],
+                "الأزياء": [{ id: "store-cat4-0", name: "موضة الشباب", category: "الأزياء", logo: "https://picsum.photos/seed/cat40/100/100", externalUrl: "#", hidden: false, description: "وصف المتجر", phone: "+966 123 456 789", address: "العنوان هنا", ownerCode: "", allowUpload: false, productDisplayMode: "grid", productDisplayCount: 10, numStrips: 10 }],
+                "الإلكترونيات": [{ id: "store-cat5-0", name: "تك إلكترونيك", category: "الإلكترونيات", logo: "https://picsum.photos/seed/cat50/100/100", externalUrl: "#", hidden: false, description: "وصف المتجر", phone: "+966 123 456 789", address: "العنوان هنا", ownerCode: "", allowUpload: false, productDisplayMode: "grid", productDisplayCount: 10, numStrips: 10 }]
             },
-            "products": {
-                "store-cat1-0": [
-                    { "id": 1, "name": "عطر مسك أبيض", "oldPrice": 322, "newPrice": 156, "image": "https://picsum.photos/seed/pcat101/300/300", "link": "#" },
-                    { "id": 2, "name": "دهن عود كمبودي", "oldPrice": 432, "newPrice": 267, "image": "https://picsum.photos/seed/pcat102/300/300", "link": "#" }
-                ],
-                "store-cat2-0": [
-                    { "id": 1, "name": "باقة ورد أحمر", "oldPrice": 341, "newPrice": 107, "image": "https://picsum.photos/seed/pcat201/300/300", "link": "#" },
-                    { "id": 2, "name": "سلة هدايا فاخرة", "oldPrice": 480, "newPrice": 264, "image": "https://picsum.photos/seed/pcat202/300/300", "link": "#" }
-                ],
-                "store-cat3-0": [
-                    { "id": 1, "name": "ساعة رجالية فاخرة", "oldPrice": 456, "newPrice": 236, "image": "https://picsum.photos/seed/pcat301/300/300", "link": "#" },
-                    { "id": 2, "name": "نظارة شمسية", "oldPrice": 220, "newPrice": 131, "image": "https://picsum.photos/seed/pcat302/300/300", "link": "#" }
-                ],
-                "store-cat4-0": [
-                    { "id": 1, "name": "تيشيرت قطني", "oldPrice": 550, "newPrice": 306, "image": "https://picsum.photos/seed/pcat401/300/300", "link": "#" },
-                    { "id": 2, "name": "جينز أزرق", "oldPrice": 341, "newPrice": 200, "image": "https://picsum.photos/seed/pcat402/300/300", "link": "#" }
-                ],
-                "store-cat5-0": [
-                    { "id": 1, "name": "آيفون 15", "oldPrice": 249, "newPrice": 97, "image": "https://picsum.photos/seed/pcat501/300/300", "link": "#" },
-                    { "id": 2, "name": "سامسونج S24", "oldPrice": 333, "newPrice": 121, "image": "https://picsum.photos/seed/pcat502/300/300", "link": "#" }
-                ]
+            products: {
+                "store-cat1-0": [{ id: 1, name: "عطر مسك أبيض", oldPrice: 322, newPrice: 156, image: "https://picsum.photos/seed/pcat101/300/300", link: "#" }, { id: 2, name: "دهن عود كمبودي", oldPrice: 432, newPrice: 267, image: "https://picsum.photos/seed/pcat102/300/300", link: "#" }],
+                "store-cat2-0": [{ id: 1, name: "باقة ورد أحمر", oldPrice: 341, newPrice: 107, image: "https://picsum.photos/seed/pcat201/300/300", link: "#" }, { id: 2, name: "سلة هدايا فاخرة", oldPrice: 480, newPrice: 264, image: "https://picsum.photos/seed/pcat202/300/300", link: "#" }],
+                "store-cat3-0": [{ id: 1, name: "ساعة رجالية فاخرة", oldPrice: 456, newPrice: 236, image: "https://picsum.photos/seed/pcat301/300/300", link: "#" }, { id: 2, name: "نظارة شمسية", oldPrice: 220, newPrice: 131, image: "https://picsum.photos/seed/pcat302/300/300", link: "#" }],
+                "store-cat4-0": [{ id: 1, name: "تيشيرت قطني", oldPrice: 550, newPrice: 306, image: "https://picsum.photos/seed/pcat401/300/300", link: "#" }, { id: 2, name: "جينز أزرق", oldPrice: 341, newPrice: 200, image: "https://picsum.photos/seed/pcat402/300/300", link: "#" }],
+                "store-cat5-0": [{ id: 1, name: "آيفون 15", oldPrice: 249, newPrice: 97, image: "https://picsum.photos/seed/pcat501/300/300", link: "#" }, { id: 2, name: "سامسونج S24", oldPrice: 333, newPrice: 121, image: "https://picsum.photos/seed/pcat502/300/300", link: "#" }]
             },
-            "testimonials": [
-                { "name": "مستخدم 1", "image": "https://picsum.photos/seed/user0/100/100", "rating": 5, "review": "تجربة رائعة مع هذا الموقع." },
-                { "name": "مستخدم 2", "image": "https://picsum.photos/seed/user1/100/100", "rating": 5, "review": "تجربة رائعة مع هذا الموقع." },
-                { "name": "مستخدم 3", "image": "https://picsum.photos/seed/user2/100/100", "rating": 4, "review": "تجربة رائعة مع هذا الموقع." }
-            ],
-            "footer": {
-                "email": "ramzealsalhy@gmail.com",
-                "phone": "778562099",
-                "whatsapp": "https://wa.me/778562099",
-                "social": [
-                    { "icon": "fab fa-facebook-f", "url": "https://facebook.com" },
-                    { "icon": "fab fa-twitter", "url": "https://twitter.com" },
-                    { "icon": "fab fa-instagram", "url": "https://instagram.com" },
-                    { "icon": "fab fa-whatsapp", "url": "https://whatsapp.com" }
-                ],
-                "payments": [
-                    "fab fa-cc-visa",
-                    "fab fa-cc-mastercard",
-                    "fab fa-cc-paypal",
-                    "fab fa-cc-apple-pay",
-                    "fab fa-cc-stripe"
-                ]
-            },
-            "settings": {
-                "currency": "SAR",
-                "language": "ar",
-                "showSaudiFlag": false,
-                "cartEnabled": false,
-                "enableUserProfile": true,
-                "orderMethods": { "whatsapp": true, "email": true, "chat": true },
-                "trustBadges": [],
-                "contests": [],
-                "contactEmail": "ramzealsalhy@gmail.com"
-            },
-            "messages": []
+            testimonials: [{ name: "مستخدم 1", image: "https://picsum.photos/seed/user0/100/100", rating: 5, review: "تجربة رائعة مع هذا الموقع." }, { name: "مستخدم 2", image: "https://picsum.photos/seed/user1/100/100", rating: 5, review: "تجربة رائعة مع هذا الموقع." }, { name: "مستخدم 3", image: "https://picsum.photos/seed/user2/100/100", rating: 4, review: "تجربة رائعة مع هذا الموقع." }],
+            footer: { email: "ramzealsalhy@gmail.com", phone: "778562099", whatsapp: "https://wa.me/778562099", social: [{ icon: "fab fa-facebook-f", url: "https://facebook.com" }, { icon: "fab fa-twitter", url: "https://twitter.com" }, { icon: "fab fa-instagram", url: "https://instagram.com" }, { icon: "fab fa-whatsapp", url: "https://whatsapp.com" }], payments: ["fab fa-cc-visa", "fab fa-cc-mastercard", "fab fa-cc-paypal", "fab fa-cc-apple-pay", "fab fa-cc-stripe"] },
+            settings: { currency: "SAR", language: "ar", showSaudiFlag: false, cartEnabled: false, enableUserProfile: true, orderMethods: { whatsapp: true, email: true, chat: true }, trustBadges: [], contests: [], contactEmail: "ramzealsalhy@gmail.com" },
+            messages: []
         };
 
         function enhanceData(data) {
@@ -385,6 +367,7 @@
         let users = JSON.parse(localStorage.getItem('users')) || [];
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
+        // ================== دوال Supabase الأساسية ==================
         async function loadFromSupabase() {
             try {
                 const { data: settings, error: settingsErr } = await supabaseClient
@@ -532,6 +515,16 @@
             showToast("✅ تم تهيئة قاعدة البيانات بنجاح");
         }
 
+        let dbReady = false;
+        let dbCallbacks = [];
+        async function initDB() {
+            await loadFromSupabase();
+            dbReady = true;
+            dbCallbacks.forEach(cb => cb());
+        }
+        function onDBReady(cb) { if (dbReady) cb(); else dbCallbacks.push(cb); }
+
+        // ================== دوال العملة والترجمة ==================
         function getCurrencySymbol() {
             if (!appData) return "ر.س";
             const symbols = { SAR: "ر.س", USD: "$", OMR: "ر.ع.", QAR: "ر.ق", AED: "د.إ" };
@@ -558,6 +551,7 @@
 
         function saveUsers() { localStorage.setItem('users', JSON.stringify(users)); }
 
+        // ================== دوال السلة ==================
         function updateCartDisplay() {
             document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
             const cartItemsDiv = document.getElementById('cartItems');
@@ -586,6 +580,7 @@
         };
 
         window.removeFromCart = function(index) { cart.splice(index, 1); localStorage.setItem('cart', JSON.stringify(cart)); updateCartDisplay(); };
+
         window.orderViaWhatsapp = function() {
             let message = "طلب جديد:\n";
             cart.forEach(item => { message += `${item.name} - ${item.newPrice} ${getCurrencySymbol()} x${item.quantity}\n`; });
@@ -593,17 +588,20 @@
             message += `الإجمالي: ${total} ${getCurrencySymbol()}`;
             window.open(`https://wa.me/${appData.footer.whatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`, '_blank');
         };
+
         window.orderViaEmail = function() {
             let subject = "طلب جديد من الموقع";
             let body = cart.map(item => `${item.name} - ${item.newPrice} ${getCurrencySymbol()} x${item.quantity}`).join('\n');
             body += `\nالإجمالي: ${cart.reduce((sum, item) => sum + item.newPrice * item.quantity, 0)} ${getCurrencySymbol()}`;
             window.location.href = `mailto:${appData.footer.email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
         };
+
         window.chatWithAdmin = function() { window.open(appData.footer.whatsapp, '_blank'); };
 
         document.getElementById('cartIcon').addEventListener('click', () => { document.getElementById('cartSidebar').classList.toggle('open'); });
         document.getElementById('closeCart').addEventListener('click', () => { document.getElementById('cartSidebar').classList.remove('open'); });
 
+        // ================== دوال الإعجابات والمفضلة ==================
         window.toggleLike = async function(productId, storeId, btn) {
             if (!currentUser) { showLoginDialog(); return; }
             const index = currentUser.likes.indexOf(productId);
@@ -975,6 +973,7 @@
             categoryPage.innerHTML = `<div style="padding:2rem;"><button class="back-home-btn" onclick="showHomePage()">${translate('العودة للرئيسية')}</button><h2 style="color:${cat.color};">${cat.name}</h2>${horizontalStores ? '<div class="stores-horizontal"><div class="stores-track">' + horizontalStores + '</div></div>' : ''}<div class="stores-grid">${gridStores || '<p>لا توجد متاجر في هذه الفئة</p>'}</div></div>`;
         }
 
+        // عرض صفحة المتجر مع أشرطة أفقية متعددة ومنتجات تجريبية
         function showStorePage(storeId) {
             let store = null;
             for (let cat in appData.stores) {
@@ -1174,10 +1173,33 @@
             showToast('تم تحديث البيانات');
         };
 
-        let visitorCount = localStorage.getItem('visitorCount') ? parseInt(localStorage.getItem('visitorCount')) : 0;
-        if (!sessionStorage.getItem('visited')) { visitorCount++; localStorage.setItem('visitorCount', visitorCount); sessionStorage.setItem('visited', 'true'); }
-        document.getElementById('visitorCount').textContent = visitorCount;
+        // ================== تسجيل الزوار في قاعدة البيانات ==================
+        async function updateVisitorCount() {
+            if (sessionStorage.getItem('visited')) return;
+            try {
+                const { data, error } = await supabaseClient.rpc('record_visitor', {
+                    ip: null,
+                    ua: navigator.userAgent,
+                    ref: document.referrer
+                });
+                if (!error && data) {
+                    document.getElementById('visitorCount').textContent = data;
+                    localStorage.setItem('visitorCount', data);
+                    sessionStorage.setItem('visited', 'true');
+                } else {
+                    throw new Error(error?.message || 'فشل RPC');
+                }
+            } catch (err) {
+                console.warn('فشل تسجيل الزيارة في قاعدة البيانات، استخدام العداد المحلي', err);
+                let localCount = localStorage.getItem('visitorCount') ? parseInt(localStorage.getItem('visitorCount')) : 0;
+                localCount++;
+                localStorage.setItem('visitorCount', localCount);
+                document.getElementById('visitorCount').textContent = localCount;
+                sessionStorage.setItem('visited', 'true');
+            }
+        }
 
+        // ================== بدء التشغيل ==================
         (async function initializeApp() {
             try {
                 await loadFromSupabase();
@@ -1185,6 +1207,7 @@
                 startHeaderInterval();
                 renderHomePage();
                 updateCartDisplay();
+                await updateVisitorCount();
                 if (window.location.hash) window.dispatchEvent(new Event('hashchange'));
                 showToast("تم تحميل الموقع بنجاح");
             } catch (err) {
@@ -1197,9 +1220,10 @@
                 startHeaderInterval();
                 renderHomePage();
                 updateCartDisplay();
+                await updateVisitorCount();
                 if (window.location.hash) window.dispatchEvent(new Event('hashchange'));
             }
         })();
     </script>
 </body>
-</html>
+    </html>
