@@ -233,6 +233,7 @@
         img, a, button { -webkit-tap-highlight-color: transparent; }
         .connection-error { background: #ef4444; color: white; padding: 15px; text-align: center; margin: 10px; border-radius: 20px; }
         .retry-connection { background: white; color: #ef4444; border: none; padding: 8px 20px; border-radius: 40px; margin-top: 10px; cursor: pointer; font-weight: bold; }
+        .manual-refresh { background: #3b82f6; color: white; border: none; padding: 8px 20px; border-radius: 40px; margin: 10px auto; display: inline-block; cursor: pointer; font-weight: bold; }
     </style>
     <script>
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); return false; });
@@ -307,7 +308,7 @@
             "categories": [
                 { "id": "cat1", "name": "العطور والبخور", "icon": "fas fa-spray-can-sparkles", "slug": "perfumes", "color": "#9b4d96", "featuredImage": "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1594035910387-fea47794261f?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 1, "adText": "", "adEnabled": false },
                 { "id": "cat2", "name": "الورد والهدايا", "icon": "fas fa-gift", "slug": "gifts", "color": "#d97706", "featuredImage": "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1513201099705-a9746e1e201f?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 2, "adText": "", "adEnabled": false },
-                { "id": "cat3", "name": "الإكسسوارات", "icon": "fas fa-ring", "slug": "accessories", "color": "#4f6f8f", "featuredImage": "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 5, "adText": "", "adEnabled": false },
+                { "id": "cat3", "name": "الإكسسوارات", "icon": "fas fa-ring", "slug": "accessories", "color": "#4f6f8f", "featuredImage": "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 3, "adText": "", "adEnabled": false },
                 { "id": "cat4", "name": "الأزياء", "icon": "fas fa-tshirt", "slug": "fashion", "color": "#2563eb", "featuredImage": "https://images.unsplash.com/photo-1539008835657-9e8e9680c956?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 4, "adText": "", "adEnabled": false },
                 { "id": "cat5", "name": "الإلكترونيات", "icon": "fas fa-laptop", "slug": "electronics", "color": "#0e7c7c", "featuredImage": "https://images.unsplash.com/photo-1550009158-9ebf69173e03?w=400&h=300&fit=crop", "indexImage": "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=600&h=400&fit=crop", "showInIndex": true, "indexOrder": 5, "adText": "", "adEnabled": false }
             ],
@@ -420,13 +421,9 @@
         let users = JSON.parse(localStorage.getItem('users')) || [];
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-        // ================== دوال Supabase الأساسية (بدون localStorage كنسخة احتياطية) ==================
+        // ================== دوال Supabase الأساسية ==================
         async function loadFromSupabase() {
             try {
-                // التحقق من الاتصال أولاً
-                const { data: test, error: testErr } = await supabaseClient.from('settings').select('id').limit(1);
-                if (testErr) throw new Error("فشل الاتصال بقاعدة البيانات");
-
                 const { data: settings, error: settingsErr } = await supabaseClient
                     .from('settings')
                     .select('data')
@@ -435,7 +432,6 @@
                     
                 if (settingsErr && settingsErr.code !== 'PGRST116') throw settingsErr;
                 
-                // إذا لم توجد بيانات، قم بتهيئة قاعدة البيانات
                 if (!settings) {
                     await seedSupabase();
                     return await loadFromSupabase();
@@ -470,7 +466,12 @@
                     header: settings.data.header,
                     ticker: settings.data.ticker,
                     design: settings.data.design,
-                    categories: categoriesRes.data,
+                    categories: categoriesRes.data.map(cat => ({
+                        ...cat,
+                        showInIndex: cat.showInIndex !== undefined ? cat.showInIndex : true,
+                        indexImage: cat.indexImage || 'https://via.placeholder.com/600x400',
+                        indexOrder: cat.indexOrder || 0
+                    })),
                     stores: storesMap,
                     products: productsMap,
                     testimonials: testimonialsRes.data,
@@ -934,18 +935,25 @@
                 document.getElementById('contestsContent').innerHTML = content;
             } else document.getElementById('contestsBar').style.display = 'none';
 
+            // ========== عرض فهرس الفئات ==========
             const indexGrid = document.getElementById('indexGrid');
             indexGrid.innerHTML = '';
-            const categoriesForIndex = appData.categories.filter(cat => cat.showInIndex).sort((a, b) => (a.indexOrder || 0) - (b.indexOrder || 0));
-            categoriesForIndex.forEach(cat => {
-                const item = document.createElement('div');
-                item.className = 'index-item';
-                item.setAttribute('data-category', cat.slug);
-                item.innerHTML = `<div class="index-image" style="background-image: url('${cat.indexImage}');"></div><div class="index-title"><i class="${cat.icon}" style="color:${cat.color};"></i> ${cat.name}</div>`;
-                item.addEventListener('click', (e) => { e.preventDefault(); showCategoryPage(cat.slug); });
-                indexGrid.appendChild(item);
-            });
+            const categoriesForIndex = (appData.categories || []).filter(cat => cat.showInIndex === true).sort((a, b) => (a.indexOrder || 0) - (b.indexOrder || 0));
+            if (categoriesForIndex.length === 0) {
+                indexGrid.innerHTML = '<p style="grid-column:1/-1; text-align:center;">لا توجد فئات لعرضها في الفهرس</p>';
+            } else {
+                categoriesForIndex.forEach(cat => {
+                    const item = document.createElement('div');
+                    item.className = 'index-item';
+                    item.setAttribute('data-category', cat.slug);
+                    const imgUrl = cat.indexImage || 'https://via.placeholder.com/600x400?text=' + encodeURIComponent(cat.name);
+                    item.innerHTML = `<div class="index-image" style="background-image: url('${imgUrl}');"></div><div class="index-title"><i class="${cat.icon || 'fas fa-tag'}" style="color:${cat.color || '#9b4d96'};"></i> ${cat.name}</div>`;
+                    item.addEventListener('click', (e) => { e.preventDefault(); showCategoryPage(cat.slug); });
+                    indexGrid.appendChild(item);
+                });
+            }
 
+            // ========== عرض الفئات مع المتاجر والمنتجات ==========
             const container = document.getElementById('categoriesContainer');
             container.innerHTML = '';
             const activeCarousels = (appData.carousel || []).filter(c => c.active).sort((a, b) => (a.order || 0) - (b.order || 0));
@@ -1045,6 +1053,7 @@
             categoryPage.innerHTML = `<div style="padding:2rem;"><button class="back-home-btn" onclick="showHomePage()">${translate('العودة للرئيسية')}</button><h2 style="color:${cat.color};">${cat.name}</h2>${horizontalStores ? '<div class="stores-horizontal"><div class="stores-track">' + horizontalStores + '</div></div>' : ''}<div class="stores-grid">${gridStores || '<p>لا توجد متاجر في هذه الفئة</p>'}</div></div>`;
         }
 
+        // ========== صفحة المتجر بدون منتجات تجريبية ==========
         function showStorePage(storeId) {
             let store = null;
             for (let cat in appData.stores) {
@@ -1052,6 +1061,7 @@
                 if (found) { store = found; break; }
             }
             if (!store) return;
+            
             document.getElementById('homePage').classList.add('hidden');
             document.getElementById('storePage').classList.remove('hidden');
             const storePage = document.getElementById('storePage');
@@ -1067,6 +1077,7 @@
                 "🎯 عروض محدودة", "📱 تقنيات حديثة", "👗 أزياء رائجة"
             ];
 
+            // توزيع المنتجات الحقيقية على الأشرطة
             const strips = Array(numStrips).fill().map(() => []);
             if (realProducts.length > 0) {
                 realProducts.forEach((prod, idx) => {
@@ -1075,38 +1086,28 @@
                 });
             }
 
-            function generateDemoProduct(stripIndex, posInStrip) {
-                const categoriesForDemo = ["عطر", "هدية", "إكسسوار", "ملابس", "جهاز إلكتروني"];
-                const demoName = `${categoriesForDemo[stripIndex % categoriesForDemo.length]} تجريبي ${posInStrip + 1}`;
-                const randomPrice = Math.floor(Math.random() * 400) + 50;
-                const demoImage = `https://picsum.photos/seed/demo_${storeId}_${stripIndex}_${posInStrip}/300/300`;
-                return {
-                    id: `demo_${storeId}_${stripIndex}_${posInStrip}`,
-                    name: demoName,
-                    oldPrice: randomPrice + Math.floor(Math.random() * 150) + 50,
-                    newPrice: randomPrice,
-                    image: demoImage,
-                    link: "#",
-                    isDemo: true
-                };
-            }
-
             let stripsHtml = '';
+            let hasAnyProducts = false;
+            
             for (let i = 0; i < numStrips; i++) {
-                let stripProducts = [...strips[i]];
-                while (stripProducts.length < productsPerStrip) {
-                    stripProducts.push(generateDemoProduct(i, stripProducts.length));
+                let stripProducts = strips[i];
+                if (stripProducts.length === 0) {
+                    // إذا لم يتبق أي منتج بعد هذا الشريط، نخرج من الحلقة
+                    let remainingProducts = 0;
+                    for (let j = i; j < numStrips; j++) remainingProducts += strips[j].length;
+                    if (remainingProducts === 0) break;
+                    continue;
                 }
+                hasAnyProducts = true;
                 stripProducts = stripProducts.slice(0, productsPerStrip);
-
+                
                 let productsHtml = '';
                 stripProducts.forEach(prod => {
-                    const addToCartBtn = (appData.settings.cartEnabled && !prod.isDemo) ? `<button class="add-to-cart-btn" onclick="addToCart({id:${prod.id}, storeId:'${store.id}', name:'${prod.name}', newPrice:${prod.newPrice}, image:'${prod.image}'})"><i class="fas fa-cart-plus"></i> ${translate('إضافة للسلة')}</button>` : '';
-                    const isDemo = prod.isDemo ? ' (تجريبي)' : '';
+                    const addToCartBtn = (appData.settings.cartEnabled) ? `<button class="add-to-cart-btn" onclick="addToCart({id:${prod.id}, storeId:'${store.id}', name:'${prod.name}', newPrice:${prod.newPrice}, image:'${prod.image}'})"><i class="fas fa-cart-plus"></i> ${translate('إضافة للسلة')}</button>` : '';
                     const productLink = prod.link && prod.link !== '#' ? prod.link : '#';
-                    productsHtml += `<div class="product-item" data-product-id="${prod.id}" data-store-id="${store.id}" data-product-name="${prod.name}${isDemo}" data-product-url="${window.location.href.split('#')[0]}#product/${store.id}/${prod.id}">
+                    productsHtml += `<div class="product-item" data-product-id="${prod.id}" data-store-id="${store.id}" data-product-name="${prod.name}" data-product-url="${window.location.href.split('#')[0]}#product/${store.id}/${prod.id}">
                         <img src="${prod.image}" loading="lazy">
-                        <div class="product-name">${prod.name}${isDemo}</div>
+                        <div class="product-name">${prod.name}</div>
                         <div class="price-container">
                             <span class="old-price">${prod.oldPrice} ${getCurrencySymbol()}</span>
                             <span class="new-price">${prod.newPrice} ${getCurrencySymbol()}</span>
@@ -1115,25 +1116,32 @@
                             <a href="${productLink}" target="_blank" class="product-visit-btn"><i class="fas fa-external-link-alt"></i> ${translate('اطلب الان')}</a>
                             ${addToCartBtn}
                         </div>
-                        ${!prod.isDemo ? `<div style="margin-top:5px;">
+                        <div style="margin-top:5px;">
                             <button class="like-btn ${currentUser && currentUser.likes.includes(prod.id) ? 'liked' : ''}" onclick="toggleLike(${prod.id}, '${store.id}', this)">${currentUser && currentUser.likes.includes(prod.id) ? '<i class="fas fa-heart"></i>' : '<i class="far fa-heart"></i>'}</button>
                             <button class="favorite-btn ${currentUser && currentUser.favorites.includes(prod.id) ? 'favorited' : ''}" onclick="toggleFavorite(${prod.id}, '${store.id}', this)">${currentUser && currentUser.favorites.includes(prod.id) ? '<i class="fas fa-bookmark"></i>' : '<i class="far fa-bookmark"></i>'}</button>
-                        </div>` : ''}
+                        </div>
                     </div>`;
                 });
+                const stripTitle = stripTitles[i % stripTitles.length];
                 stripsHtml += `<div class="multi-horizontal">
-                    <div class="section-title">${stripTitles[i % stripTitles.length]}</div>
+                    <div class="section-title">${stripTitle}</div>
                     <div class="products-horizontal">
                         <div class="products-track">${productsHtml}</div>
                     </div>
                 </div>`;
             }
+            
+            if (!hasAnyProducts || realProducts.length === 0) {
+                stripsHtml = '<p style="text-align:center; padding:20px;">🚫 لا توجد منتجات في هذا المتجر حالياً.</p>';
+            }
 
             const shareButtons = `<div class="share-buttons"><a href="https://wa.me/?text=${encodeURIComponent(store.name + ' ' + window.location.href)}" target="_blank" class="share-btn whatsapp"><i class="fab fa-whatsapp"></i></a><a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn facebook"><i class="fab fa-facebook-f"></i></a><a href="https://twitter.com/intent/tweet?text=${encodeURIComponent(store.name)}&url=${encodeURIComponent(window.location.href)}" target="_blank" class="share-btn twitter"><i class="fab fa-twitter"></i></a></div>`;
+            
             let ownerUploadHtml = '';
             if (store.allowUpload) {
                 ownerUploadHtml = `<div class="store-owner-upload"><h4>رفع شعار جديد</h4><input type="password" id="ownerCode-${store.id}" placeholder="الرمز السري"><input type="file" id="ownerLogo-${store.id}" accept="image/*"><button onclick="uploadStoreLogo('${store.id}')">رفع</button></div>`;
             }
+            
             storePage.innerHTML = `<div style="padding:2rem;">
                 <button class="back-home-btn" onclick="showHomePage()">${translate('العودة للرئيسية')}</button>
                 <div style="display:flex; gap:20px; margin-bottom:20px;">
@@ -1149,7 +1157,7 @@
                 </div>
                 ${ownerUploadHtml}
                 <h3>منتجات المتجر</h3>
-                ${stripsHtml || '<p>لا توجد منتجات</p>'}
+                ${stripsHtml}
             </div>`;
             attachLongPressShare();
         }
@@ -1269,6 +1277,7 @@
                     <h3>فشل الاتصال بقاعدة البيانات</h3>
                     <p>تأكد من اتصالك بالإنترنت وأعد تحميل الصفحة</p>
                     <button class="retry-connection" onclick="location.reload()">محاولة مرة أخرى</button>
+                    <button class="manual-refresh" onclick="refreshData()">تحديث البيانات</button>
                 </div>`;
                 showToast("⚠️ لا يمكن تحميل البيانات. تأكد من اتصالك بالإنترنت.");
             }
